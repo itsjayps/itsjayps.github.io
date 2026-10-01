@@ -1,6 +1,12 @@
 // Keep the footer year current
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// Give the header a solid background once the page is scrolled
+const header = document.querySelector('.site-header');
+const updateHeader = () => header.classList.toggle('is-scrolled', window.scrollY > 40);
+updateHeader();
+window.addEventListener('scroll', updateHeader, { passive: true });
+
 // Fade sections in as they scroll into view
 const revealItems = document.querySelectorAll('.reveal');
 
