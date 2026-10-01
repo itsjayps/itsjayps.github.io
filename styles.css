@@ -5,10 +5,10 @@
   --text: #f2f2f2;
   --muted: #8e8e8e;
   --line: #242424;
-  --accent: #1fd6a4;
-  --on-accent: #06281f;
-  --purple: #8b3dff;
-  --purple-glow: #c9a6ff;
+  --accent: #a970ff;
+  --accent-solid: #8b3dff;
+  --on-accent: #ffffff;
+  --glow: #c9a6ff;
 
   --font: "Outfit", "Segoe UI", system-ui, sans-serif;
 }
@@ -101,7 +101,7 @@ ol {
   position: absolute;
   left: -9999px;
   top: 0;
-  background: var(--accent);
+  background: var(--accent-solid);
   color: var(--on-accent);
   padding: 10px 16px;
   z-index: 100;
@@ -136,12 +136,13 @@ ol {
 }
 
 .btn-accent {
-  background: var(--accent);
+  background: var(--accent-solid);
   color: var(--on-accent);
 }
 
 .btn-accent:hover {
   background: var(--text);
+  color: var(--black);
 }
 
 .btn-ghost {
@@ -208,8 +209,7 @@ ol {
   color: var(--accent);
 }
 
-/* Hero: the photo is black and white with a glowing purple headline.
-   On hover the photo takes a purple tint and the headline turns white. */
+/* Hero: black and white photo with a glowing purple headline */
 .hero {
   position: relative;
   display: flex;
@@ -230,28 +230,13 @@ ol {
   filter: grayscale(1) contrast(1.05);
 }
 
-.hero-tint {
-  position: absolute;
-  inset: 0;
-  background: var(--purple);
-  mix-blend-mode: color;
-  opacity: 0;
-  transition: opacity 0.8s ease;
-}
-
-.hero:hover .hero-tint {
-  opacity: 1;
+.hero .label {
+  color: var(--text);
 }
 
 .hero h1 {
-  color: var(--purple-glow);
+  color: var(--glow);
   text-shadow: 0 0 14px rgba(139, 61, 255, 0.9), 0 0 44px rgba(139, 61, 255, 0.65);
-  transition: color 0.8s ease, text-shadow 0.8s ease;
-}
-
-.hero:hover h1 {
-  color: var(--text);
-  text-shadow: 0 0 0 rgba(139, 61, 255, 0);
 }
 
 .hero-shade {
@@ -627,8 +612,6 @@ ol {
     transition: none;
   }
 
-  .hero-tint,
-  .hero h1,
   .thumb,
   .btn {
     transition: none;
