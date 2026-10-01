@@ -304,10 +304,49 @@ ol {
   padding-top: clamp(40px, 5vw, 64px);
 }
 
+.marquee {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
 .services {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 40px 32px;
+}
+
+/* Scrolling version, switched on by script.js. Hover to pause. */
+.marquee.is-running {
+  max-width: none;
+  padding: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee.is-running .services {
+  display: flex;
+  gap: 0;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.marquee.is-running:hover .services {
+  animation-play-state: paused;
+}
+
+.marquee.is-running .services li {
+  flex: 0 0 340px;
+  margin-right: 56px;
+}
+
+/* The list is repeated four times, so shifting by a quarter loops seamlessly */
+@keyframes marquee {
+  to {
+    transform: translateX(-25%);
+  }
 }
 
 .services li {
@@ -566,6 +605,15 @@ ol {
 
   .hero-photo {
     object-position: 44% 30%;
+  }
+
+  .marquee {
+    padding: 0 20px;
+  }
+
+  .marquee.is-running .services li {
+    flex-basis: 290px;
+    margin-right: 40px;
   }
 
   .services,
