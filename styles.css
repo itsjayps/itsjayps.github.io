@@ -234,6 +234,11 @@ ol {
   color: var(--text);
 }
 
+/* Each <span> in the headline sits on its own line */
+.hero h1 span {
+  display: block;
+}
+
 .hero h1 {
   color: var(--glow);
   text-shadow: 0 0 14px rgba(139, 61, 255, 0.9), 0 0 44px rgba(139, 61, 255, 0.65);
@@ -557,6 +562,16 @@ ol {
 
 .footer-inner a:hover {
   color: var(--accent);
+}
+
+/* Purple trail that follows the mouse, drawn by script.js */
+.cursor-trail {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 90;
 }
 
 /* Scroll reveal (only when JavaScript is running) */
