@@ -7,6 +7,8 @@
   --line: #242424;
   --accent: #1fd6a4;
   --on-accent: #06281f;
+  --purple: #8b3dff;
+  --purple-glow: #c9a6ff;
 
   --font: "Outfit", "Segoe UI", system-ui, sans-serif;
 }
@@ -206,7 +208,8 @@ ol {
   color: var(--accent);
 }
 
-/* Hero: the photo is black and white, and turns to color on hover */
+/* Hero: the photo is black and white with a glowing purple headline.
+   On hover the photo takes a purple tint and the headline turns white. */
 .hero {
   position: relative;
   display: flex;
@@ -225,11 +228,30 @@ ol {
   object-fit: cover;
   object-position: 42% 30%;
   filter: grayscale(1) contrast(1.05);
-  transition: filter 0.8s ease;
 }
 
-.hero:hover .hero-photo {
-  filter: grayscale(0) contrast(1);
+.hero-tint {
+  position: absolute;
+  inset: 0;
+  background: var(--purple);
+  mix-blend-mode: color;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.hero:hover .hero-tint {
+  opacity: 1;
+}
+
+.hero h1 {
+  color: var(--purple-glow);
+  text-shadow: 0 0 14px rgba(139, 61, 255, 0.9), 0 0 44px rgba(139, 61, 255, 0.65);
+  transition: color 0.8s ease, text-shadow 0.8s ease;
+}
+
+.hero:hover h1 {
+  color: var(--text);
+  text-shadow: 0 0 0 rgba(139, 61, 255, 0);
 }
 
 .hero-shade {
@@ -605,7 +627,8 @@ ol {
     transition: none;
   }
 
-  .hero-photo,
+  .hero-tint,
+  .hero h1,
   .thumb,
   .btn {
     transition: none;
