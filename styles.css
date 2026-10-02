@@ -179,6 +179,9 @@ ol {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
   font-size: 1.15rem;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -186,7 +189,12 @@ ol {
   text-decoration: none;
 }
 
-.brand span {
+.brand-badge {
+  width: 30px;
+  height: 30px;
+}
+
+.brand-name span {
   color: var(--accent);
 }
 
@@ -739,7 +747,13 @@ ol {
   }
 
   .brand {
+    gap: 8px;
     font-size: 0.95rem;
+  }
+
+  .brand-badge {
+    width: 24px;
+    height: 24px;
   }
 
   .hero-photo {
@@ -786,6 +800,13 @@ ol {
 
   .facts div + div {
     border-top: 1px solid var(--line);
+  }
+}
+
+/* Very narrow phones: no room for the badge beside the menu */
+@media (max-width: 400px) {
+  .brand-badge {
+    display: none;
   }
 }
 
