@@ -28,12 +28,14 @@ if (marquee && !reducedMotion) {
   marquee.classList.add('is-running');
 }
 
-// Purple trail behind the mouse cursor (mouse users only; touch screens have no cursor)
+// Purple fireflies that drift off the mouse cursor (mouse users only; touch screens have no cursor)
 const hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 if (hasMouse && !reducedMotion) {
-  const TRAIL_LIFE = 450; // how long each part of the trail lasts, in milliseconds
-  const TRAIL_WIDTH = 7; // thickness at the cursor, in pixels
+  const FIREFLY_SPACING = 16; // mouse travel, in pixels, between each new firefly (lower = more)
+  const FIREFLY_LIFE = 1400; // how long a firefly glows, in milliseconds
+  const FIREFLY_BURST = 12; // how many fly out when the mouse lands on a link or button
+  const FIREFLY_MAX = 160; // upper limit on screen at once
 
   const canvas = document.createElement('canvas');
   canvas.className = 'cursor-trail';
@@ -41,8 +43,13 @@ if (hasMouse && !reducedMotion) {
   document.body.appendChild(canvas);
 
   const ctx = canvas.getContext('2d');
-  let points = [];
+  let fireflies = [];
   let drawing = false;
+  let lastFrame = 0;
+  let lastX = null;
+  let lastY = null;
+  let travelled = 0;
+  let hoveredLink = null;
 
   const resizeCanvas = () => {
     const ratio = window.devicePixelRatio || 1;
@@ -51,25 +58,62 @@ if (hasMouse && !reducedMotion) {
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   };
 
-  const drawTrail = (now) => {
-    points = points.filter((point) => now - point.time < TRAIL_LIFE);
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    ctx.lineCap = 'round';
-    ctx.shadowColor = 'rgba(139, 61, 255, 0.9)';
-    ctx.shadowBlur = 16;
+  const addFirefly = (x, y, speed) => {
+    if (fireflies.length >= FIREFLY_MAX) fireflies.shift();
+    const angle = Math.random() * Math.PI * 2;
 
-    for (let i = 1; i < points.length; i++) {
-      const strength = 1 - (now - points[i].time) / TRAIL_LIFE;
-      ctx.strokeStyle = `rgba(185, 140, 255, ${strength})`;
-      ctx.lineWidth = TRAIL_WIDTH * strength + 0.5;
-      ctx.beginPath();
-      ctx.moveTo(points[i - 1].x, points[i - 1].y);
-      ctx.lineTo(points[i].x, points[i].y);
-      ctx.stroke();
+    fireflies.push({
+      x: x + (Math.random() - 0.5) * 10,
+      y: y + (Math.random() - 0.5) * 10,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 0.15, // slight upward float
+      size: 1 + Math.random() * 1.6,
+      life: FIREFLY_LIFE * (0.6 + Math.random() * 0.8),
+      born: performance.now(),
+      blink: Math.random() * Math.PI * 2,
+    });
+
+    if (!drawing) {
+      drawing = true;
+      lastFrame = performance.now();
+      requestAnimationFrame(drawFireflies);
     }
+  };
 
-    if (points.length) {
-      requestAnimationFrame(drawTrail);
+  const drawGlow = (x, y, radius, color) => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  const drawFireflies = (now) => {
+    const step = Math.min((now - lastFrame) / 16.7, 3);
+    lastFrame = now;
+    fireflies = fireflies.filter((fly) => now - fly.born < fly.life);
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.globalCompositeOperation = 'lighter';
+
+    fireflies.forEach((fly) => {
+      const age = (now - fly.born) / fly.life;
+
+      // Wander a little, like a real firefly, and slow down over time
+      fly.vx = (fly.vx + (Math.random() - 0.5) * 0.08 * step) * 0.985;
+      fly.vy = (fly.vy + (Math.random() - 0.5) * 0.08 * step) * 0.985;
+      fly.x += fly.vx * step;
+      fly.y += fly.vy * step;
+
+      // Fade in and out over its life, with a soft blink on top
+      const blink = 0.65 + 0.35 * Math.sin(fly.blink + now * 0.009);
+      const alpha = Math.sin(age * Math.PI) * blink;
+
+      drawGlow(fly.x, fly.y, fly.size * 5, `rgba(139, 61, 255, ${alpha * 0.14})`);
+      drawGlow(fly.x, fly.y, fly.size * 2.4, `rgba(169, 112, 255, ${alpha * 0.4})`);
+      drawGlow(fly.x, fly.y, fly.size, `rgba(226, 204, 255, ${alpha})`);
+    });
+
+    if (fireflies.length) {
+      requestAnimationFrame(drawFireflies);
     } else {
       drawing = false;
     }
@@ -77,13 +121,30 @@ if (hasMouse && !reducedMotion) {
 
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
+
   window.addEventListener('mousemove', (event) => {
-    points.push({ x: event.clientX, y: event.clientY, time: performance.now() });
-    if (!drawing) {
-      drawing = true;
-      requestAnimationFrame(drawTrail);
+    if (lastX !== null) {
+      travelled += Math.hypot(event.clientX - lastX, event.clientY - lastY);
+    }
+    lastX = event.clientX;
+    lastY = event.clientY;
+
+    if (travelled >= FIREFLY_SPACING) {
+      travelled = 0;
+      addFirefly(lastX, lastY, 0.2 + Math.random() * 0.4);
     }
   }, { passive: true });
+
+  // A burst of fireflies when the mouse lands on a link or button
+  document.addEventListener('mouseover', (event) => {
+    const link = event.target.closest('a, button');
+    if (link && link !== hoveredLink) {
+      for (let i = 0; i < FIREFLY_BURST; i++) {
+        addFirefly(event.clientX, event.clientY, 0.8 + Math.random() * 1.6);
+      }
+    }
+    hoveredLink = link;
+  });
 }
 
 // Custom cursor: the dot sits on the mouse, the ring eases after it and grows over links and buttons

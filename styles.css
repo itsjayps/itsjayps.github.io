@@ -564,7 +564,7 @@ ol {
   color: var(--accent);
 }
 
-/* Purple trail that follows the mouse, drawn by script.js */
+/* Purple fireflies that drift off the mouse, drawn by script.js */
 .cursor-trail {
   position: fixed;
   inset: 0;
