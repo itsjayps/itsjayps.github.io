@@ -525,6 +525,74 @@ ol {
   letter-spacing: 0.04em;
 }
 
+/* Tags and store link under each project */
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.project-tags li {
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.project-link {
+  display: inline-block;
+  margin-top: 20px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid currentColor;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--accent);
+  transition: color 0.2s ease;
+}
+
+.project-link:hover {
+  color: var(--text);
+}
+
+/* Process */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px 32px;
+}
+
+.steps li {
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.step-number {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+}
+
+.steps h3 {
+  margin-bottom: 10px;
+}
+
+.steps p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
 /* Contact */
 .contact {
   text-align: center;
@@ -547,6 +615,13 @@ ol {
 
 .contact-email:hover {
   color: var(--accent);
+}
+
+.contact-note {
+  max-width: 34em;
+  margin: 28px auto 0;
+  font-size: 0.9rem;
+  color: var(--muted);
 }
 
 /* Footer */
@@ -636,7 +711,8 @@ ol {
 
 /* Tablet */
 @media (max-width: 1000px) {
-  .services {
+  .services,
+  .steps {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -680,6 +756,7 @@ ol {
   }
 
   .services,
+  .steps,
   .work-grid {
     grid-template-columns: 1fr;
   }
