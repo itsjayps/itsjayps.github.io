@@ -147,65 +147,27 @@ if (hasMouse && !reducedMotion) {
   });
 }
 
-// Custom cursor: the dot sits on the mouse, the ring eases after it and grows over links and buttons
+// Custom cursor: a glowing dot in place of the arrow, which grows over links and buttons
 if (hasMouse && !reducedMotion) {
-  const RING_EASE = 0.18; // how quickly the ring catches up (1 = instantly)
-
   const dot = document.createElement('div');
-  const ring = document.createElement('div');
   dot.className = 'cursor-dot';
-  ring.className = 'cursor-ring';
   dot.setAttribute('aria-hidden', 'true');
-  ring.setAttribute('aria-hidden', 'true');
-  document.body.append(ring, dot);
+  document.body.appendChild(dot);
 
   const root = document.documentElement;
   root.classList.add('has-cursor');
 
-  let mouseX = 0;
-  let mouseY = 0;
-  let ringX = 0;
-  let ringY = 0;
-  let following = false;
-
-  const followMouse = () => {
-    ringX += (mouseX - ringX) * RING_EASE;
-    ringY += (mouseY - ringY) * RING_EASE;
-    ring.style.translate = `${ringX}px ${ringY}px`;
-
-    if (Math.abs(mouseX - ringX) > 0.1 || Math.abs(mouseY - ringY) > 0.1) {
-      requestAnimationFrame(followMouse);
-    } else {
-      following = false;
-    }
-  };
-
   window.addEventListener('mousemove', (event) => {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    dot.style.translate = `${mouseX}px ${mouseY}px`;
-
-    // First move: start the ring on the mouse instead of flying in from the corner
-    if (!root.classList.contains('cursor-visible')) {
-      ringX = mouseX;
-      ringY = mouseY;
-      root.classList.add('cursor-visible');
-    }
-
-    if (!following) {
-      following = true;
-      requestAnimationFrame(followMouse);
-    }
+    dot.style.translate = `${event.clientX}px ${event.clientY}px`;
+    root.classList.add('cursor-visible');
   }, { passive: true });
 
   document.addEventListener('mouseover', (event) => {
-    const overLink = Boolean(event.target.closest('a, button'));
-    dot.classList.toggle('is-hover', overLink);
-    ring.classList.toggle('is-hover', overLink);
+    dot.classList.toggle('is-hover', Boolean(event.target.closest('a, button')));
   });
 
-  window.addEventListener('mousedown', () => ring.classList.add('is-pressed'));
-  window.addEventListener('mouseup', () => ring.classList.remove('is-pressed'));
+  window.addEventListener('mousedown', () => dot.classList.add('is-pressed'));
+  window.addEventListener('mouseup', () => dot.classList.remove('is-pressed'));
   root.addEventListener('mouseleave', () => root.classList.remove('cursor-visible'));
 }
 
