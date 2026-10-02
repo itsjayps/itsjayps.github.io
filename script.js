@@ -171,7 +171,7 @@ if (hasMouse && !reducedMotion) {
   const followMouse = () => {
     ringX += (mouseX - ringX) * RING_EASE;
     ringY += (mouseY - ringY) * RING_EASE;
-    ring.style.transform = `translate(${ringX}px, ${ringY}px)`;
+    ring.style.translate = `${ringX}px ${ringY}px`;
 
     if (Math.abs(mouseX - ringX) > 0.1 || Math.abs(mouseY - ringY) > 0.1) {
       requestAnimationFrame(followMouse);
@@ -183,7 +183,7 @@ if (hasMouse && !reducedMotion) {
   window.addEventListener('mousemove', (event) => {
     mouseX = event.clientX;
     mouseY = event.clientY;
-    dot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+    dot.style.translate = `${mouseX}px ${mouseY}px`;
 
     // First move: start the ring on the mouse instead of flying in from the corner
     if (!root.classList.contains('cursor-visible')) {
