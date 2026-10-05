@@ -35,6 +35,7 @@ if (hasMouse && !reducedMotion) {
   const FIREFLY_SPACING = 16; // mouse travel, in pixels, between each new firefly (lower = more)
   const FIREFLY_LIFE = 1400; // how long a firefly glows, in milliseconds
   const FIREFLY_BURST = 12; // how many fly out when the mouse lands on a link or button
+  const FIREFLY_SERVICE_BURST = 30; // how many flash out of a service when the mouse lands on it
   const FIREFLY_MAX = 160; // upper limit on screen at once
 
   const canvas = document.createElement('canvas');
@@ -50,6 +51,7 @@ if (hasMouse && !reducedMotion) {
   let lastY = null;
   let travelled = 0;
   let hoveredLink = null;
+  let hoveredService = null;
 
   const resizeCanvas = () => {
     const ratio = window.devicePixelRatio || 1;
@@ -144,6 +146,20 @@ if (hasMouse && !reducedMotion) {
       }
     }
     hoveredLink = link;
+
+    // A flash of fireflies out of a service when the mouse lands on it
+    const service = event.target.closest('.services li');
+    if (service && service !== hoveredService) {
+      const box = service.getBoundingClientRect();
+      for (let i = 0; i < FIREFLY_SERVICE_BURST; i++) {
+        addFirefly(
+          box.left + Math.random() * box.width,
+          box.top + Math.random() * box.height,
+          1 + Math.random() * 2.2
+        );
+      }
+    }
+    hoveredService = service;
   });
 }
 
