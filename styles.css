@@ -482,6 +482,11 @@ ol {
   color: var(--text);
 }
 
+.about-copy strong {
+  font-weight: 400;
+  color: var(--accent);
+}
+
 .facts {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
