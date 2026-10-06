@@ -343,7 +343,7 @@ ol {
   display: flex;
   gap: 0;
   width: max-content;
-  animation: marquee 40s linear infinite;
+  animation: marquee 70s linear infinite;
 }
 
 .marquee.is-running:hover .services {
