@@ -453,6 +453,45 @@ ol {
   }
 }
 
+/*
+  Full-page screenshots that scroll down the store on hover.
+  Set --scroll-time on each .thumb-scroll (longer pages need more time).
+*/
+.thumb-scroll {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  container-type: size;
+}
+
+.thumb-scroll img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: auto;
+  object-fit: initial;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* Glides back to the top quickly when the mouse leaves */
+  .thumb-scroll img {
+    transition: filter 0.4s ease, transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .project-media:hover .thumb-scroll,
+  .project-media:focus-visible .thumb-scroll {
+    transform: none;
+  }
+
+  /* 100cqh is the frame height, so the page stops with its footer at the bottom of the frame */
+  .project-media:hover .thumb-scroll img,
+  .project-media:focus-visible .thumb-scroll img {
+    filter: grayscale(0);
+    transform: translateY(calc(-100% + 100cqh));
+    transition: filter 0.4s ease, transform var(--scroll-time, 8s) cubic-bezier(0.45, 0, 0.55, 1);
+  }
+}
+
 .thumb span {
   font-size: 0.8rem;
   letter-spacing: 0.22em;
