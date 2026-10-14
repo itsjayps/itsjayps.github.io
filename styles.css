@@ -154,6 +154,21 @@ ol {
   color: var(--accent);
 }
 
+/* Scroll progress: thin purple bar across the top, filled by script.js */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-solid), var(--accent), var(--glow));
+  box-shadow: 0 0 12px rgba(139, 61, 255, 0.7);
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+
 /* Header */
 .site-header {
   position: fixed;

@@ -7,6 +7,29 @@ const updateHeader = () => header.classList.toggle('is-scrolled', window.scrollY
 updateHeader();
 window.addEventListener('scroll', updateHeader, { passive: true });
 
+// Purple bar along the top that fills as the page is scrolled
+const progress = document.querySelector('.scroll-progress');
+let progressQueued = false;
+
+const updateProgress = () => {
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  const amount = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
+  progress.style.transform = `scaleX(${amount})`;
+  progressQueued = false;
+};
+
+const queueProgress = () => {
+  if (progressQueued) return;
+  progressQueued = true;
+  requestAnimationFrame(updateProgress);
+};
+
+if (progress) {
+  updateProgress();
+  window.addEventListener('scroll', queueProgress, { passive: true });
+  window.addEventListener('resize', queueProgress);
+}
+
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Turn the services list into a looping marquee (skipped for visitors who prefer reduced motion)
