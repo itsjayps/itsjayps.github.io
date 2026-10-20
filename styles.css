@@ -223,13 +223,32 @@ ol {
   text-transform: uppercase;
 }
 
+/* Nav version of the tools hover: purple text with a glow and a bar sweeping in underneath */
 .nav a {
+  position: relative;
+  padding-block: 6px;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.nav a::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-solid), var(--glow));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .nav a:hover {
-  color: var(--accent);
+  color: var(--glow);
+  text-shadow: 0 0 12px rgba(139, 61, 255, 0.8);
+}
+
+.nav a:hover::after {
+  transform: scaleX(1);
 }
 
 /* Hero: black and white photo with a glowing purple headline */
@@ -382,6 +401,7 @@ ol {
   grid-template-columns: 40px 1fr;
   gap: 16px;
   align-items: start;
+  padding: 24px 22px;
 }
 
 .icon {
@@ -392,6 +412,13 @@ ol {
   stroke-width: 1.3;
   stroke-linecap: round;
   stroke-linejoin: round;
+  transition: stroke 0.4s ease, filter 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.services li:hover .icon {
+  stroke: var(--glow);
+  filter: drop-shadow(0 4px 12px rgba(139, 61, 255, 0.7));
+  transform: translateY(-3px);
 }
 
 .services h3 {
@@ -550,11 +577,10 @@ ol {
 }
 
 .facts div {
-  padding: 22px 20px 22px 0;
+  padding: 22px 20px;
 }
 
 .facts div + div {
-  padding-left: 20px;
   border-left: 1px solid var(--line);
 }
 
@@ -565,6 +591,11 @@ ol {
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 6px;
+  transition: color 0.4s ease;
+}
+
+.facts div:hover dt {
+  color: var(--accent);
 }
 
 .facts dd {
@@ -637,7 +668,8 @@ ol {
   transform: scaleX(1);
 }
 
-.tool-icon {
+.tool-icon,
+.step-number {
   display: grid;
   place-items: center;
   width: 44px;
@@ -662,7 +694,8 @@ ol {
   letter-spacing: 0.02em;
 }
 
-.tool:hover .tool-icon {
+.tool:hover .tool-icon,
+.steps li:hover .step-number {
   background: linear-gradient(145deg, var(--glow), var(--accent-solid));
   border-color: var(--accent);
   color: var(--on-accent);
@@ -685,12 +718,19 @@ ol {
   color: var(--muted);
 }
 
-/* Tags and store link under each project */
+/* Tags and store link under each project. Cards in a row stretch to the same
+   height, so margin-top: auto pins the tags and link to the bottom and they line up. */
+.project {
+  display: flex;
+  flex-direction: column;
+}
+
 .project-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 18px;
+  margin-top: auto;
+  padding-top: 18px;
 }
 
 .project-tags li {
@@ -706,6 +746,7 @@ ol {
 
 .project-link {
   display: inline-block;
+  align-self: flex-start;
   margin-top: 20px;
   padding-bottom: 4px;
   border-bottom: 1px solid currentColor;
@@ -730,17 +771,71 @@ ol {
 }
 
 .steps li {
-  padding-top: 22px;
+  padding: 26px 22px 24px;
   border-top: 1px solid var(--line);
 }
 
+/*
+  Same hover as the tools grid, shared by the steps, the About facts, and the services:
+  panel fill on ::before (.js .reveal owns the element's own transition) and a purple bar
+  on ::after. The bar sits on the top line for steps and on the bottom elsewhere.
+*/
+.steps li,
+.facts div,
+.services li {
+  position: relative;
+  isolation: isolate;
+}
+
+.steps li::before,
+.facts div::before,
+.services li::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--panel);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.steps li::after,
+.facts div::after,
+.services li::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-solid), var(--glow));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.steps li::after {
+  inset: -1px 0 auto;
+}
+
+.facts div::after {
+  bottom: -1px;
+}
+
+.steps li:hover::before,
+.facts div:hover::before,
+.services li:hover::before {
+  opacity: 1;
+}
+
+.steps li:hover::after,
+.facts div:hover::after,
+.services li:hover::after {
+  transform: scaleX(1);
+}
+
 .step-number {
-  display: block;
-  margin-bottom: 14px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 .steps h3 {
@@ -958,7 +1053,7 @@ ol {
 
   .facts div,
   .facts div + div {
-    padding: 16px 0;
+    padding: 16px 20px;
     border-left: 0;
   }
 
@@ -989,7 +1084,18 @@ ol {
   .btn,
   .tool,
   .tool::after,
-  .tool-icon {
+  .tool-icon,
+  .steps li::before,
+  .steps li::after,
+  .step-number,
+  .facts div::before,
+  .facts div::after,
+  .facts dt,
+  .services li::before,
+  .services li::after,
+  .icon,
+  .nav a,
+  .nav a::after {
     transition: none;
   }
 }
