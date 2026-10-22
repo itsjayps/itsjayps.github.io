@@ -32,6 +32,135 @@ if (progress) {
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Deep-space background: purple bokeh and dust that slowly swirl around the middle of the
+// screen, and spin faster while the page is scrolled. Reduced motion gets one still frame.
+const space = document.createElement('canvas');
+space.className = 'space-bg';
+space.setAttribute('aria-hidden', 'true');
+document.body.prepend(space);
+
+if (space.getContext) {
+  const BOKEH_PER_MILLION_PX = 70; // soft glowing circles per million screen pixels (higher = more)
+  const DUST_PER_MILLION_PX = 420; // tiny twinkling specks per million screen pixels
+  const IDLE_SPIN = 0.00003; // slow turn while the page is still, in radians per millisecond
+  const SCROLL_SPIN = 0.0003; // extra turn per pixel scrolled (higher = more swirl)
+
+  const ctx = space.getContext('2d');
+  let width = 0;
+  let height = 0;
+  let bokeh = [];
+  let dust = [];
+  let lastFrame = 0;
+  let spin = 0; // eased scroll spin, so the swirl glides instead of jumping
+  let idle = 0;
+
+  // One pre-rendered glowing disc, scaled per particle, so each frame stays cheap
+  const makeSprite = (core, edge) => {
+    const sprite = document.createElement('canvas');
+    sprite.width = sprite.height = 64;
+    const s = sprite.getContext('2d');
+    const gradient = s.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gradient.addColorStop(0, core);
+    gradient.addColorStop(0.45, edge);
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    s.fillStyle = gradient;
+    s.fillRect(0, 0, 64, 64);
+    return sprite;
+  };
+
+  const sprites = [
+    makeSprite('rgba(201, 166, 255, 1)', 'rgba(139, 61, 255, 0.55)'),
+    makeSprite('rgba(226, 204, 255, 1)', 'rgba(169, 112, 255, 0.5)'),
+    makeSprite('rgba(169, 112, 255, 1)', 'rgba(110, 40, 220, 0.5)'),
+  ];
+  const dustSprite = makeSprite('rgba(255, 255, 255, 1)', 'rgba(201, 166, 255, 0.6)');
+
+  const random = (min, max) => min + Math.random() * (max - min);
+
+  // Particles sit at a radius and angle around the screen centre. The field is a circle
+  // as wide as the screen's diagonal, so rotating it never leaves an empty corner.
+  const makeParticle = (maxRadius, size, alpha, sprite) => ({
+    radius: Math.sqrt(Math.random()) * maxRadius,
+    angle: Math.random() * Math.PI * 2,
+    depth: random(0.35, 1), // nearer particles (closer to 1) swirl faster
+    wobble: Math.random() * Math.PI * 2,
+    twinkle: Math.random() * Math.PI * 2,
+    size,
+    alpha,
+    sprite,
+  });
+
+  const populate = () => {
+    const area = (width * height) / 1e6;
+    const maxRadius = Math.hypot(width, height) / 2 + 40;
+
+    bokeh = Array.from({ length: Math.round(area * BOKEH_PER_MILLION_PX) }, () =>
+      makeParticle(maxRadius, random(3, 11), random(0.18, 0.5), sprites[Math.floor(Math.random() * sprites.length)])
+    );
+    dust = Array.from({ length: Math.round(area * DUST_PER_MILLION_PX) }, () =>
+      makeParticle(maxRadius, random(0.8, 2.6), random(0.35, 1), dustSprite)
+    );
+  };
+
+  const resize = () => {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    space.width = width * ratio;
+    space.height = height * ratio;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    populate();
+  };
+
+  const drawField = (particles, rotation, now, twinkleSpeed) => {
+    const cx = width / 2;
+    const cy = height / 2;
+
+    particles.forEach((p) => {
+      const angle = p.angle + rotation * p.depth;
+      // A small in-and-out breathing on the radius, so the swirl isn't perfectly rigid
+      const radius = p.radius + Math.sin(p.wobble + now * 0.0004) * 6 * p.depth;
+      const x = cx + Math.cos(angle) * radius;
+      const y = cy + Math.sin(angle) * radius;
+      if (x < -20 || y < -20 || x > width + 20 || y > height + 20) return;
+
+      const size = p.size * (0.6 + p.depth * 0.6);
+      ctx.globalAlpha = p.alpha * (0.6 + 0.4 * Math.sin(p.twinkle + now * twinkleSpeed));
+      ctx.drawImage(p.sprite, x - size * 2, y - size * 2, size * 4, size * 4);
+    });
+  };
+
+  const draw = (time) => {
+    const now = reducedMotion ? 0 : time;
+    const elapsed = lastFrame ? Math.min(now - lastFrame, 50) : 0;
+    lastFrame = now;
+
+    idle += elapsed * IDLE_SPIN;
+    const target = window.scrollY * SCROLL_SPIN;
+    spin = reducedMotion ? target : spin + (target - spin) * Math.min(elapsed / 700, 1);
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = 'lighter';
+    drawField(bokeh, idle + spin, now, 0.0008);
+    drawField(dust, idle + spin, now, 0.003);
+    ctx.globalAlpha = 1;
+
+    if (!reducedMotion) requestAnimationFrame(draw);
+  };
+
+  resize();
+  window.addEventListener('resize', () => {
+    resize();
+    if (reducedMotion) draw(0);
+  });
+
+  if (reducedMotion) {
+    draw(0);
+  } else {
+    requestAnimationFrame(draw);
+  }
+}
+
 // Turn the services list into a looping marquee (skipped for visitors who prefer reduced motion)
 const marquee = document.querySelector('.marquee');
 

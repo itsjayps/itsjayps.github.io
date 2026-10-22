@@ -176,14 +176,31 @@ ol {
   left: 0;
   right: 0;
   z-index: 50;
-  border-bottom: 1px solid transparent;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
 }
 
+/* Frosted glass once scrolled: the space background shows through, tinted purple */
 .site-header.is-scrolled {
-  background: rgba(10, 10, 10, 0.92);
-  backdrop-filter: blur(8px);
-  border-bottom-color: var(--line);
+  background: rgba(14, 8, 26, 0.55);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: 0 10px 40px -20px rgba(139, 61, 255, 0.45);
+}
+
+/* Glowing purple edge along the bottom, brightest in the middle and fading at the sides */
+.site-header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 61, 255, 0.5) 20%, var(--glow) 50%, rgba(139, 61, 255, 0.5) 80%, transparent);
+  box-shadow: 0 0 10px rgba(139, 61, 255, 0.6);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.site-header.is-scrolled::after {
+  opacity: 1;
 }
 
 .header-inner {
@@ -207,6 +224,7 @@ ol {
 .brand-badge {
   width: 30px;
   height: 30px;
+  filter: drop-shadow(0 0 8px rgba(139, 61, 255, 0.6));
 }
 
 .brand-name span {
@@ -272,6 +290,12 @@ ol {
   filter: grayscale(1) contrast(1.05);
 }
 
+/* Photo and shade sit below the space background (z-index: -1), so the dust drifts over them */
+.hero-photo,
+.hero-shade {
+  z-index: -2;
+}
+
 .hero .label {
   color: var(--text);
 }
@@ -326,7 +350,6 @@ ol {
 /* Sections */
 .section {
   padding: clamp(72px, 9vw, 120px) 0;
-  border-top: 1px solid var(--line);
 }
 
 .section-head {
@@ -904,6 +927,17 @@ ol {
 
 .footer-inner a:hover {
   color: var(--accent);
+}
+
+/* Deep-space bokeh and dust behind the whole page, drawn by script.js.
+   Sections are transparent, so it shows everywhere except over the hero photo and solid tiles. */
+.space-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* Purple fireflies that drift off the mouse, drawn by script.js */
